@@ -1,10 +1,12 @@
 import fastify from 'fastify';
-import { createTrip } from './routes/trip/create';
 import {
   serializerCompiler,
   validatorCompiler,
 } from 'fastify-type-provider-zod';
+import { setupDayjs } from './lib/dayjs';
+import { createTrip } from './routes/trip/create';
 
+setupDayjs();
 const app = fastify();
 
 app.setValidatorCompiler(validatorCompiler);
