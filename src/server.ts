@@ -1,14 +1,19 @@
+import fastifyCors from '@fastify/cors';
 import fastify from 'fastify';
 import {
   serializerCompiler,
   validatorCompiler,
 } from 'fastify-type-provider-zod';
 import { setupDayjs } from './lib/dayjs';
-import { createTrip } from './routes/trip/create';
 import { confirmTrip } from './routes/trip/confirm';
+import { createTrip } from './routes/trip/create';
 
 setupDayjs();
 const app = fastify();
+
+app.register(fastifyCors, {
+  origin: '*',
+});
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
