@@ -4,11 +4,10 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from 'fastify-type-provider-zod';
-import { setupDayjs } from './lib/dayjs';
 import { confirmTrip } from './routes/trip/confirm';
 import { createTrip } from './routes/trip/create';
+import './lib/dayjs';
 
-setupDayjs();
 const app = fastify();
 
 app.register(fastifyCors, {
