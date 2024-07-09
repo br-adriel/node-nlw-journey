@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { FastifyInstance } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod';
@@ -19,14 +20,35 @@ export async function listActivities(app: FastifyInstance) {
       const trip = await prisma.trip.findUnique({
         where: { id: tripId },
         include: {
-          activities: true,
+          activities: {
+            orderBy: {
+              occurs_at: 'asc',
+            },
+          },
         },
       });
 
       if (!trip) throw new Error('Trip not found');
 
+      const differenceInDaysBetweenTripStartAndEnd = dayjs(trip.ends_at).diff(
+        trip.starts_at,
+        'days'
+      );
+
+      const activities = Array.from({
+        length: differenceInDaysBetweenTripStartAndEnd + 1,
+      }).map((_, i) => {
+        const date = dayjs(trip.starts_at).add(i, 'days');
+        return {
+          date: date.toDate(),
+          activities: trip.activities.filter((a) => {
+            return dayjs(a.occurs_at).isSame(date, 'day');
+          }),
+        };
+      });
+
       return {
-        activities: trip.activities,
+        activities,
       };
     }
   );
