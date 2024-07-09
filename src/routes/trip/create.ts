@@ -17,12 +17,19 @@ export async function createTrip(app: FastifyInstance) {
           ends_at: z.coerce.date(),
           owner_name: z.string(),
           owner_email: z.string().email(),
+          emails_to_invite: z.array(z.string().email()),
         }),
       },
     },
-    async (req, res) => {
-      const { starts_at, ends_at, owner_name, owner_email, destination } =
-        req.body;
+    async (req) => {
+      const {
+        starts_at,
+        ends_at,
+        owner_name,
+        owner_email,
+        destination,
+        emails_to_invite,
+      } = req.body;
 
       if (dayjs(starts_at).isBefore(new Date())) {
         throw new Error('Invalid trip start date');
@@ -38,15 +45,25 @@ export async function createTrip(app: FastifyInstance) {
           ends_at,
           starts_at,
           participants: {
-            create: {
-              email: owner_email,
-              name: owner_name,
-              is_owner: true,
-              is_confirmed: true,
+            createMany: {
+              data: [
+                {
+                  email: owner_email,
+                  name: owner_name,
+                  is_owner: true,
+                  is_confirmed: true,
+                },
+                ...emails_to_invite.map((m) => ({ email: m })),
+              ],
             },
           },
         },
       });
+
+      const formattedTripStartDate = dayjs(starts_at).format('D[ de ]MMMM');
+      const formattedTripEndDate = dayjs(ends_at).format('D[ de ]MMMM');
+
+      const confirmationLink = `http://localhost:3000/trips/${trip.id}/confirm`;
 
       const mail = await getMailClient();
       const message = await mail.sendMail({
@@ -58,8 +75,20 @@ export async function createTrip(app: FastifyInstance) {
           name: owner_name,
           address: owner_email,
         },
-        subject: 'Testando o envio de email',
-        html: '<p>Teste do envio de email</p>',
+        subject: `Confirme sua viagem para ${destination}`,
+        html: `
+          <div style="font-family: sans-serif; font-size: 16px; line-height: 1.6;">
+            <p>Você solicitou a criação de uma viagem para <strong>${destination}</strong> nas datas de ${formattedTripStartDate} até ${formattedTripEndDate}.</p>
+            <p></p>
+            <p>Para confirmar sua viagem, clique no link abaixo:</p>
+            <p></p>
+            <p>
+            <a href="${confirmationLink}">Confirmar viagem</a>
+            </p>
+            <p></p>
+            <p>Caso você não saiba do que se trata esse e-mail, apenas ignore.</p>
+          </div>
+        `.trim(),
       });
       return {
         tripId: trip.id,
