@@ -8,14 +8,15 @@ import './lib/dayjs';
 import { createActivity } from './routes/activity/create';
 import { listActivities } from './routes/activity/list';
 import { createLink } from './routes/link/create';
+import { listLinks } from './routes/link/list';
 import { confirmParticipant } from './routes/participant/confirm';
+import { getParticipant } from './routes/participant/get';
+import { listParticipants } from './routes/participant/list';
 import { confirmTrip } from './routes/trip/confirm';
 import { createTrip } from './routes/trip/create';
-import { listLinks } from './routes/link/list';
-import { listParticipants } from './routes/participant/list';
 import { createTripInvite } from './routes/trip/create-invite';
-import { updateTrip } from './routes/trip/update';
 import { getTrip } from './routes/trip/get';
+import { updateTrip } from './routes/trip/update';
 
 const app = fastify();
 
@@ -34,6 +35,7 @@ app.register(getTrip);
 
 app.register(confirmParticipant);
 app.register(listParticipants);
+app.register(getParticipant);
 
 app.register(createActivity);
 app.register(listActivities);
