@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod';
+import { NotFoundError } from '../../errors/not-found-error';
 import { prisma } from '../../lib/prisma';
 
 export async function getTrip(app: FastifyInstance) {
@@ -27,7 +28,7 @@ export async function getTrip(app: FastifyInstance) {
         },
       });
 
-      if (!trip) throw new Error('Trip not found');
+      if (!trip) throw new NotFoundError('Trip not found');
 
       return { trip };
     }
