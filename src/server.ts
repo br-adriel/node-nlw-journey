@@ -4,6 +4,7 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from 'fastify-type-provider-zod';
+import { errorHandler } from './error-handler';
 import './lib/dayjs';
 import { createActivity } from './routes/activity/create';
 import { listActivities } from './routes/activity/list';
@@ -26,6 +27,8 @@ app.register(fastifyCors, {
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
+
+app.setErrorHandler(errorHandler);
 
 app.register(createTrip);
 app.register(confirmTrip);
