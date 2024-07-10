@@ -4,6 +4,7 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from 'fastify-type-provider-zod';
+import { env } from './env';
 import { errorHandler } from './error-handler';
 import './lib/dayjs';
 import { createActivity } from './routes/activity/create';
@@ -46,6 +47,6 @@ app.register(listActivities);
 app.register(createLink);
 app.register(listLinks);
 
-app.listen({ port: 3000 }).then(() => {
+app.listen({ port: env.PORT }).then(() => {
   console.log('SERVER RUNNING');
 });

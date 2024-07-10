@@ -3,6 +3,7 @@ import { FastifyInstance } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import nodemailer from 'nodemailer';
 import { z } from 'zod';
+import { env } from '../../env';
 import { NotFoundError } from '../../errors/not-found-error';
 import { getMailClient } from '../../lib/nodemailer';
 import { prisma } from '../../lib/prisma';
@@ -42,7 +43,7 @@ export async function createTripInvite(app: FastifyInstance) {
 
       const mail = await getMailClient();
 
-      const confirmationLink = `http://localhost:3000/participants/${trip.id}/confirm/`;
+      const confirmationLink = `${env.API_BASE_URL}/participants/${trip.id}/confirm/`;
       const message = await mail.sendMail({
         from: {
           name: 'Equipe plann.er',

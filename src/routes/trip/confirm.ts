@@ -3,10 +3,10 @@ import { FastifyInstance } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import nodemailer from 'nodemailer';
 import { z } from 'zod';
+import { env } from '../../env';
+import { NotFoundError } from '../../errors/not-found-error';
 import { getMailClient } from '../../lib/nodemailer';
 import { prisma } from '../../lib/prisma';
-import { ClientError } from '../../errors/client-error';
-import { NotFoundError } from '../../errors/not-found-error';
 
 export async function confirmTrip(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
@@ -36,7 +36,7 @@ export async function confirmTrip(app: FastifyInstance) {
       }
 
       if (trip.is_confirmed) {
-        return res.redirect(`http://localhost:5173/trips/${tripId}`);
+        return res.redirect(`${env.WEB_BASE_URL}/trips/${tripId}`);
       }
 
       await prisma.trip.update({
@@ -51,7 +51,7 @@ export async function confirmTrip(app: FastifyInstance) {
 
       Promise.all(
         trip.participants.map(async (p) => {
-          const confirmationLink = `http://localhost:3000/participants/${p.id}/confirm/`;
+          const confirmationLink = `${env.API_BASE_URL}/participants/${p.id}/confirm/`;
           const message = await mail.sendMail({
             from: {
               name: 'Equipe plann.er',
@@ -77,7 +77,7 @@ export async function confirmTrip(app: FastifyInstance) {
         })
       );
 
-      return res.redirect(`http://localhost:5173/trips/${tripId}`);
+      return res.redirect(`${env.WEB_BASE_URL}/trips/${tripId}`);
     }
   );
 }
